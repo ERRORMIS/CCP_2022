@@ -10,7 +10,9 @@ import Incubator from "../models/incubator_model.js";
 import Login from "../models/login_model.js";
 
 const register = async (req, res) => {
+
   let userModel;
+
   const {
     type,
     name,
@@ -22,10 +24,12 @@ const register = async (req, res) => {
     jobTitle,
     partnerType,
     company,
+    specializedArea,
   } = req.body;
 
   if (type == "Student") {
     userModel = "Student";
+
     if (!name || !email || !password) {
       throw new BadRequestError("please provide all values");
     }
@@ -37,6 +41,7 @@ const register = async (req, res) => {
 
     const user = await Student.create({ name, email });
     const userID = user._id;
+
     const login = await Login.create({
       userID,
       userModel,
@@ -66,8 +71,10 @@ const register = async (req, res) => {
       location: user.name,
     });
   } else if (type == "Staff") {
+
     userModel = "Staff";
-    if (!name || !email || !password || !department || !jobRole) {
+
+if (!name || !email || !password || !department || !jobRole) {
       throw new BadRequestError("please provide all values");
     }
 
@@ -78,6 +85,7 @@ const register = async (req, res) => {
 
     const user = await Staff.create({ name, email, department, jobRole });
     const userID = user._id;
+    
     const login = await Login.create({
       userID,
       userModel,
@@ -106,6 +114,7 @@ const register = async (req, res) => {
       location: user.name,
     });
   } else if (type == "Alumni") {
+
     userModel = "Alumni";
     if (!name || !email || !password || !jobTitle) {
       throw new BadRequestError("please provide all values");
@@ -118,6 +127,7 @@ const register = async (req, res) => {
 
     const user = await Alumni.create({ name, email, jobTitle });
     const userID = user._id;
+
     const login = await Login.create({
       userID,
       userModel,
@@ -147,6 +157,7 @@ const register = async (req, res) => {
       location: user.name,
     });
   } else if (type == "Partner") {
+
     userModel = "Partner";
     if (!name || !email || !password || !partnerType) {
       throw new BadRequestError("please provide all values");
@@ -159,6 +170,7 @@ const register = async (req, res) => {
 
     const user = await Partner.create({ name, email, partnerType });
     const userID = user._id;
+
     const login = await Login.create({
       userID,
       userModel,
@@ -184,6 +196,7 @@ const register = async (req, res) => {
       location: user.name,
     });
   } else if (type == "Incubator") {
+
     userModel = "Incubator";
     if (!company || !email || !password) {
       throw new BadRequestError("please provide all values");
@@ -196,6 +209,7 @@ const register = async (req, res) => {
 
     const user = await Incubator.create({ company, email });
     const userID = user._id;
+
     const login = await Login.create({
       userID,
       userModel,
@@ -241,6 +255,7 @@ const updateUser = async (req, res) => {
     location,
     faculty,
     studentID,
+    specialization
   } = req.body;
 
   if (type == "Student") {
@@ -260,6 +275,7 @@ const updateUser = async (req, res) => {
       studentID: studentID,
       contactNo: contactNo,
       faculty: faculty,
+      specialization
     };
 
     const user = await Student.findOneAndUpdate({ _id: id }, data, {
@@ -285,6 +301,7 @@ const updateUser = async (req, res) => {
         contactNo: user.contactNo,
         faculty: user.faculty,
         studentID: user.studentID,
+        specialization: user.specialization
       },
       token,
       location: user.name,
@@ -296,7 +313,6 @@ const updateUser = async (req, res) => {
 
     const userAlreadyExists = await Staff.findOne({ email });
 
-    //const user = await Staff.create({ name, email, department, jobRole });
     const data = {
       name: name,
       lastName: lastName,
@@ -306,6 +322,7 @@ const updateUser = async (req, res) => {
       address: address,
       department: department,
       jobRole: jobRole,
+      specializedAreas: specializedAreas,
     };
 
     const user = await Staff.findOneAndUpdate({ _id: id }, data, {
@@ -328,6 +345,7 @@ const updateUser = async (req, res) => {
         address: user.address,
         department: user.department,
         jobRole: user.jobRole,
+        specializedAreas: user.specializedAreas,
       },
       token,
       location: user.name,
@@ -343,7 +361,7 @@ const updateUser = async (req, res) => {
     // }
 
     //const user = await Alumni.create({ name, email, jobTitle });
-    console.log(lastName);
+
     const data = {
       name: name,
       lastName: lastName,
@@ -354,6 +372,7 @@ const updateUser = async (req, res) => {
       company: company,
       jobTitle: jobTitle,
       graduatedYear: graduatedYear,
+      specializedAreas: specializedAreas,
     };
 
     const user = await Alumni.findOneAndUpdate({ _id: id }, data, {
@@ -377,6 +396,7 @@ const updateUser = async (req, res) => {
         company: user.company,
         jobTitle: user.jobTitle,
         graduatedYear: user.graduatedYear,
+        specializedAreas: specializedAreas,
       },
       token,
       location: user.name,
