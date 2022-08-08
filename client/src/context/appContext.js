@@ -39,6 +39,10 @@ import {
   GET_STUDENT_SUCCESS,
   GET_FILTERED_USER_BASE_ON_PROJECT_REQUIREMENT,
   STOP_LOADING,
+  FETCH_PROJECT_LOGS,
+  GET_REPORT_DETAILS_SUCCESS,
+  UPDATE_RECORDS,
+  START_LOADING,
 } from "./actions";
 
 const token = localStorage.getItem("token");
@@ -94,6 +98,11 @@ const initialState = {
     alumniList: [],
     staffList: [],
   },
+  projectLogs: [],
+  financialOwnerId: "",
+  initialCost: "",
+  records: [],
+  chartRecords: [],
 };
 
 const AppContext = React.createContext();
@@ -160,7 +169,7 @@ const AppProvider = ({ children }) => {
       const { data } = await axios.post(`/api/v1/user/register`, currentUser);
 
       const { user, token, location } = data;
-
+      console.log(user)
       dispatch({
         type: SETUP_USER_SUCCESS,
         payload: { user, token, location, alertText },
@@ -181,9 +190,8 @@ const AppProvider = ({ children }) => {
     dispatch({ type: SETUP_USER_BEGIN });
     try {
       const { data } = await axios.post(`/api/v1/auth/testLogin`, currentUser);
-
       const { user, token, location } = data;
-
+      console.log(user)
       dispatch({
         type: SETUP_USER_SUCCESS,
         payload: { user, token, location, alertText },
@@ -191,6 +199,7 @@ const AppProvider = ({ children }) => {
 
       addUserToLocalStorage({ user, token, location });
     } catch (error) {
+      console.log(error)
       dispatch({
         type: SETUP_USER_ERROR,
         payload: { msg: error.response.data.msg },
@@ -212,7 +221,7 @@ const AppProvider = ({ children }) => {
   const updateUser = async (currentUser) => {
     dispatch({ type: UPDATE_USER_BEGIN });
     try {
-      console.log(currentUser)
+      console.log(currentUser);
       const { data } = await authFetch.post("/user/updateUser", currentUser);
 
       const { user, location, token } = data;
@@ -479,7 +488,7 @@ const AppProvider = ({ children }) => {
         email,
         type,
       });
-
+      console.log(data)
       const { getData } = data;
       // console.log(getData);
       return getData;
@@ -549,11 +558,55 @@ const AppProvider = ({ children }) => {
         dispatch({
           type: STOP_LOADING,
         });
-
-      }, 800)
+      }, 800);
     } catch (error) {}
   };
 
+  const getProjectLogs = async () => {
+    try {
+      const { data } = await authFetch.get("/logs");
+      dispatch({
+        type: FETCH_PROJECT_LOGS,
+        payload: data.data
+      });
+    } catch (error) {}
+  }
+
+  const getFinancialDetail = async () => {
+    try {
+      const { data } = await authFetch.get("/report");
+      dispatch({
+        type: GET_REPORT_DETAILS_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {}
+  };
+
+  const updateRecords = (record) => {
+    dispatch({ type: UPDATE_RECORDS, payload: record });
+  };
+
+  const saveFinancialDetail = async (records) => {
+    try {
+      const { data } = await authFetch.put("/report", {
+        createdBy: state.financialOwnerId,
+        initialCost: state.initialCost,
+        records,
+      });
+      dispatch({
+        type: START_LOADING,
+      });
+      dispatch({
+        type: GET_REPORT_DETAILS_SUCCESS,
+        payload: data,
+      });
+      setTimeout(() => {
+        dispatch({
+          type: STOP_LOADING,
+        });
+      }, 800);
+    } catch (error) {}
+  };
   return (
     <AppContext.Provider
       value={{
@@ -582,6 +635,10 @@ const AppProvider = ({ children }) => {
         getUserDataByID,
         uploadProfile,
         getUsersBaseOnProjectRequirements,
+        getProjectLogs,
+        getFinancialDetail,
+        updateRecords,
+        saveFinancialDetail,
       }}
     >
       {children}

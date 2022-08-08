@@ -9,6 +9,8 @@ import ProjectComment from "../models/project_comment_model.js";
 import Student_model from "../models/student_model.js";
 import Alumni from "../models/alumni_model.js";
 import Staff from "../models/staff_model.js";
+import logService from "../services/logService.js";
+import User from "../models/User.js";
 
 const createJob = async (req, res) => {
   const { title, owner, description, members } = req.body;
@@ -21,6 +23,11 @@ const createJob = async (req, res) => {
   }
   req.body.createdBy = req.user.userId;
   const job = await Job.create(req.body);
+  await logService.createProject({
+    authorName: owner,
+    projectId: job._id,
+    projectName: title
+  })
   res.status(StatusCodes.CREATED).json({ job });
 };
 
@@ -57,6 +64,9 @@ const getAllJobs = async (req, res) => {
       path: "comments",
       populate: {
         path: "author",
+        populate: {
+          path: "userID",
+        },
       },
     });
 
@@ -90,6 +100,9 @@ const getAllJobs = async (req, res) => {
       path: "comments",
       populate: {
         path: "author",
+        populate: {
+          path: "userID",
+        },
       },
     });
 
@@ -124,6 +137,12 @@ const updateJob = async (req, res) => {
     runValidators: true,
   });
 
+  await logService.updateProject({
+    authorName: owner,
+    projectId: jobId,
+    projectName: title
+  })
+
   res.status(StatusCodes.OK).json({ updatedJob });
 };
 
@@ -137,9 +156,17 @@ const deleteJob = async (req, res) => {
   }
 
   checkPermissions(req.user, job.createdBy);
-
-  await job.remove();
-
+  try {
+    const user = await login_model.findById(req.user.userId);
+    console.log(user)
+  // await job.remove();
+  await logService.deleteProject({
+    authorName: user.name,
+    projectName: job.title
+  });
+  } catch(err) {
+    console.log(err)
+  }
   res.status(StatusCodes.OK).json({ msg: "Success! Job removed" });
 };
 

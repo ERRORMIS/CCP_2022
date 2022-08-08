@@ -25,6 +25,7 @@ const accountTypeList = [
   { label: "Alumni", value: "Alumni" },
   { label: "Partner", value: "Partner" },
   { label: "Incubator", value: "Incubator" },
+  { label: "Management", value: "Management" },
 ];
 
 const partnerTypeList = [
@@ -125,6 +126,17 @@ const RegisterPage = () => {
         currentUser,
         alertText: "User Created! Redirecting...",
       });
+    } else if (type === "Management") {
+      if (!email || !password || !name) {
+        displayAlert();
+        return;
+      }
+
+      const currentUser = { email, name, password, type};
+      setupUser({
+        currentUser,
+        alertText: "User Created! Redirecting...",
+      })
     }
   };
 

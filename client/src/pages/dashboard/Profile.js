@@ -18,7 +18,6 @@ const Profile = () => {
   const [nic, setNic] = useState(user?.nic);
   const [id] = useState(user?.id);
   const [type] = useState(user?.type);
-  const [specializedAreas, setSpecializedAreas] = useState(user?.specializedAreas);
 
   const [department, setDepartment] = useState(user?.department);
   const [jobRole, setJobRole] = useState(user?.jobRole);
@@ -51,7 +50,7 @@ const Profile = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name || !email || !lastName || !nic) {
+    if ((!name || !email || !lastName || !nic )&& type !== 'Management') {
       displayAlert();
       return;
     }
@@ -101,6 +100,8 @@ const Profile = () => {
       });
     } else if (type === "Partner") {
       updateUser({ name, email, lastName, nic, type, id, location });
+    } else if (type === "Management") {
+      updateUser({ name, email, type, id, location });
     }
   };
 
@@ -166,7 +167,7 @@ const Profile = () => {
             handleChange={(e) => setEmail(e.target.value)}
           />
 
-          {user.type !== "Partner" && (
+          {!["Partner", "Management"].includes(user.type) && (
             <FormRow
               type="text"
               labelText="last name"

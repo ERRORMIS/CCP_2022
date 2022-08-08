@@ -8,6 +8,7 @@ import Staff from "../models/staff_model.js";
 import Alumni from "../models/alumni_model.js";
 import Partner from "../models/partner_model.js";
 import Incubator from "../models/incubator_model.js";
+import Management from "../models/management_model.js";
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -192,7 +193,7 @@ const login_new = async (req, res) => {
         contactNo: get_user.contactNo,
         faculty: get_user.faculty,
         userLoginId: user._id,
-        specializedAreas: get_user.specializedAreas,
+        specialization: get_user.specialization,
       },
       token,
       location: get_user.name,
@@ -214,7 +215,7 @@ const login_new = async (req, res) => {
         department: get_user.department,
         jobRole: get_user.jobRole,
         userLoginId: user._id,
-        specializedAreas: get_user.specializedAreas,
+        specialization: get_user.specialization,
       },
       token,
       location: get_user.name,
@@ -237,7 +238,7 @@ const login_new = async (req, res) => {
         jobTitle: get_user.jobTitle,
         graduatedYear: get_user.graduatedYear,
         userLoginId: user._id,
-        specializedAreas: get_user.specializedAreas,
+        specialization: get_user.specialization,
       },
       token,
       location: get_user.name,
@@ -271,6 +272,20 @@ const login_new = async (req, res) => {
         name: get_user.company,
         type: user.type,
         img: get_user.img,
+        userLoginId: user._id,
+      },
+      token,
+      location: get_user.name,
+    });
+  }else if (user.type == "Management") {
+    const get_user = await Management.findOne({ email });
+
+    res.status(StatusCodes.OK).json({
+      user: {
+        id: get_user._id,
+        email: get_user.email,
+        name: get_user.name,
+        type: user.type,
         userLoginId: user._id,
       },
       token,

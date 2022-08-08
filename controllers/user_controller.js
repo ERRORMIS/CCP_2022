@@ -6,7 +6,7 @@ import Staff from "../models/staff_model.js";
 import Alumni from "../models/alumni_model.js";
 import Partner from "../models/partner_model.js";
 import Incubator from "../models/incubator_model.js";
-
+import Management from "../models/management_model.js";
 import Login from "../models/login_model.js";
 
 const register = async (req, res) => {
@@ -231,6 +231,41 @@ if (!name || !email || !password || !department || !jobRole) {
       token,
       location: user.company,
     });
+  } else if (type == "Management") {
+    userModel = "Management";
+    if (!email || !password) {
+      throw new BadRequestError("please provide all values");
+    }
+
+    const userAlreadyExists = await Management.findOne({ email });
+    if (userAlreadyExists) {
+      throw new BadRequestError("Email already in used");
+    }
+
+    const user = await Management.create({ email });
+    const userID = user._id;
+
+    const login = await Login.create({
+      userID,
+      userModel,
+      type,
+      email,
+      password,
+    });
+
+    const token = user.createJWT();
+
+    res.status(StatusCodes.CREATED).json({
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.company,
+        type: type,
+        img: user.img,
+      },
+      token,
+      location: user.company,
+    });
   }
 };
 
@@ -322,7 +357,7 @@ const updateUser = async (req, res) => {
       address: address,
       department: department,
       jobRole: jobRole,
-      specializedAreas: specializedAreas,
+      specialization: specialization,
     };
 
     const user = await Staff.findOneAndUpdate({ _id: id }, data, {
@@ -345,7 +380,7 @@ const updateUser = async (req, res) => {
         address: user.address,
         department: user.department,
         jobRole: user.jobRole,
-        specializedAreas: user.specializedAreas,
+        specialization: user.specialization,
       },
       token,
       location: user.name,
@@ -372,7 +407,7 @@ const updateUser = async (req, res) => {
       company: company,
       jobTitle: jobTitle,
       graduatedYear: graduatedYear,
-      specializedAreas: specializedAreas,
+      specialization: specialization,
     };
 
     const user = await Alumni.findOneAndUpdate({ _id: id }, data, {
@@ -396,7 +431,7 @@ const updateUser = async (req, res) => {
         company: user.company,
         jobTitle: user.jobTitle,
         graduatedYear: user.graduatedYear,
-        specializedAreas: specializedAreas,
+        specialization: specialization,
       },
       token,
       location: user.name,
@@ -464,6 +499,30 @@ const updateUser = async (req, res) => {
       },
       token,
       location: user.company,
+    });
+  } else if (type === 'Management') {
+    if (!name ) {
+      throw new BadRequestError("please provide all values");
+    }
+
+    const user = await Management.findOneAndUpdate({ _id: id }, {
+      name,
+      email
+    }, {
+      new: true,
+      runValidators: true,
+    });
+  
+   
+    res.status(StatusCodes.CREATED).json({
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        type: type,
+      },
+      token,
+      location: user.name,
     });
   }
 };

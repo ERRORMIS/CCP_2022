@@ -1,7 +1,7 @@
-import mongoose from 'mongoose'
-import validator from 'validator'
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import mongoose from "mongoose";
+import validator from "validator";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const LoginSchema = new mongoose.Schema(
   {
@@ -13,7 +13,7 @@ const LoginSchema = new mongoose.Schema(
     userModel: {
       type: String,
       required: true,
-      enum: ["Alumni", "Incubator", "Partner", "Staff", "Student"],
+      enum: ["Alumni", "Incubator", "Partner", "Staff", "Student", "Management"],
     },
     type: {
       type: String,
@@ -33,22 +33,22 @@ const LoginSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-LoginSchema.pre('save', async function () {
+LoginSchema.pre("save", async function () {
   // console.log(this.modifiedPaths())
-  if (!this.isModified('password')) return
-  const salt = await bcrypt.genSalt(10)
-  this.password = await bcrypt.hash(this.password, salt)
-})
+  if (!this.isModified("password")) return;
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
 
 LoginSchema.methods.createJWT = function () {
   return jwt.sign({ userId: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_LIFETIME,
-  })
-}
+  });
+};
 
 LoginSchema.methods.comparePassword = async function (candidatePassword) {
-  const isMatch = await bcrypt.compare(candidatePassword, this.password)
-  return isMatch
-}
+  const isMatch = await bcrypt.compare(candidatePassword, this.password);
+  return isMatch;
+};
 
-export default mongoose.model('Login', LoginSchema)
+export default mongoose.model("Login", LoginSchema);
