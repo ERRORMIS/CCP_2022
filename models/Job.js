@@ -50,6 +50,14 @@ const JobSchema = new mongoose.Schema(
       type: [mongoose.Types.ObjectId],
       ref: "Project_comment",
     },
+    teamMembers: {
+      type: {
+        studentList: [mongoose.Types.ObjectId],
+        alumniList: [mongoose.Types.ObjectId],
+        staffList: [mongoose.Types.ObjectId],
+      },
+      required: false,
+    },
   },
   { timestamps: true }
 );

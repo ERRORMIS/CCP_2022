@@ -6,9 +6,12 @@ import mongoose from "mongoose";
 import moment from "moment";
 import login_model from "../models/login_model.js";
 import ProjectComment from "../models/project_comment_model.js";
+import Student_model from "../models/student_model.js";
+import Alumni from "../models/alumni_model.js";
+import Staff from "../models/staff_model.js";
 
 const createJob = async (req, res) => {
-  const { title, owner, description } = req.body;
+  const { title, owner, description, members } = req.body;
 
   var bb = description.replace(/&lt;/g, "<");
   req.body.description = bb;
@@ -24,68 +27,80 @@ const createJob = async (req, res) => {
 const getAllJobs = async (req, res) => {
   const { status, jobType, sort, search, requirement } = req.query;
 
+  let queryObject = {};
 
-  let queryObject = {
-    // createdBy: req.user.userId,
-  };
-  // add stuff based on condition
+  try {
+    // add stuff based on condition
+    if (status && status !== "all") {
+      queryObject.status = status;
+    }
+    if (jobType && jobType !== "all") {
+      queryObject.jobType = jobType;
+    }
+    if (search) {
+      queryObject.title = { $regex: search, $options: "i" };
+    }
 
-  if (status && status !== "all") {
-    queryObject.status = status;
-  }
-  if (jobType && jobType !== "all") {
-    queryObject.jobType = jobType;
-  }
-  if (search) {
-    queryObject.title = { $regex: search, $options: "i" };
-  }
+    if (requirement && requirement !== "all") {
+      queryObject = { ...queryObject, "requirement.value": requirement };
+    }
 
-  if (requirement && requirement !== 'all') {
-    queryObject = { ...queryObject, "requirement.value": requirement}
-  }
-
-  // NO AWAIT
-
-  let result = Job.find(queryObject).populate({
-    path: "comments",
-    populate: {
-      path: "author",
+    const queryObjectForOtherJobs = {
+      ...queryObject,
+      createdBy: { $ne: req.user.userId },
+    };
+    // NO AWAIT
+    let result = Job.find({
+      ...queryObject,
+      createdBy: { $ne: req.user.userId },
+    }).populate({
+      path: "comments",
       populate: {
-        path: "userID",
+        path: "author",
       },
-    },
-  });
+    });
 
-  // chain sort conditions
+    // chain sort conditions for other jobs
 
-  if (sort === "latest") {
-    result = result.sort("-createdAt");
+    if (sort === "latest") {
+      result = result.sort("-createdAt");
+    }
+    if (sort === "oldest") {
+      result = result.sort("createdAt");
+    }
+    if (sort === "a-z") {
+      result = result.sort("title");
+    }
+    if (sort === "z-a") {
+      result = result.sort("-title");
+    }
+
+    // setup pagination for other jobs
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    result = result.skip(skip).limit(limit);
+
+    let otherJobs = await result;
+
+    // my jobs
+    const queryObjectForMyJobs = { ...queryObject, createdBy: req.user.userId };
+    const myJobs = await Job.find(queryObjectForMyJobs).populate({
+      path: "comments",
+      populate: {
+        path: "author",
+      },
+    });
+
+    const totalJobs = await Job.countDocuments(queryObjectForOtherJobs);
+    const numOfPages = Math.ceil(totalJobs / limit);
+    res
+      .status(StatusCodes.OK)
+      .json({ jobs: { otherJobs, myJobs }, totalJobs, numOfPages });
+  } catch (error) {
+    console.log(error);
   }
-  if (sort === "oldest") {
-    result = result.sort("createdAt");
-  }
-  if (sort === "a-z") {
-    result = result.sort("title");
-  }
-  if (sort === "z-a") {
-    result = result.sort("-title");
-  }
-
-  //
-
-  // setup pagination
-  const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 10;
-  const skip = (page - 1) * limit;
-
-  result = result.skip(skip).limit(limit);
-
-  const jobs = await result;
-
-  const totalJobs = await Job.countDocuments(queryObject);
-  const numOfPages = Math.ceil(totalJobs / limit);
-
-  res.status(StatusCodes.OK).json({ jobs, totalJobs, numOfPages });
 };
 
 const updateJob = async (req, res) => {
@@ -184,16 +199,14 @@ const addProjectComment = async (req, res) => {
 
     if (!job) {
       return res.status(400).json({ msg: "project not found" });
-
     } else {
-      const userId = req.user.userId
-      console.log(userId)
+      const userId = req.user.userId;
       const user = await login_model.findById(userId);
-      console.log(user)
+
       const comment = await ProjectComment.create({
         author: user._id,
         body: req.body.body,
-        time: moment().format('LLL'),
+        time: moment().format("LLL"),
       });
 
       const commentsInJob = job.comments;
@@ -206,11 +219,26 @@ const addProjectComment = async (req, res) => {
       );
       return res.status(200).json({ data: updatedJob });
     }
-
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(400).json({ msg: "Request failed" });
   }
+};
+
+const filterUsersByProjectRequirement = async (req, res) => {
+  const { requirements } = req.body;
+
+  let query = {};
+
+  if (requirements && requirements.length > 0) {
+    query = { ...query, "specialization.value": { $in: requirements } };
+  }
+
+  const students = await Student_model.find(query);
+  const alumni = await Alumni.find(query);
+  const staff = await Staff.find(query);
+
+  res.status(200).json({ students, alumni, staff });
 };
 
 export {
@@ -220,4 +248,5 @@ export {
   updateJob,
   showStats,
   addProjectComment,
+  filterUsersByProjectRequirement,
 };
