@@ -2,11 +2,13 @@ import { useState } from "react";
 import { FormRow, Alert } from "../../components";
 import { useAppContext } from "../../context/appContext";
 import Wrapper from "../../assets/wrappers/DashboardFormPage";
+import Select from "react-select";
+import { userTypesWithSpecialization } from "../../constants/constants";
 
 const Profile = () => {
   const [selectedImage, setSelectedImage, values, setValues] = useState(null);
 
-  const { user, showAlert, displayAlert, updateUser, isLoading, uploadProfile } =
+  const { user, showAlert, displayAlert, updateUser, isLoading, uploadProfile, projectRequirement } =
     useAppContext();
 
   const [name, setName] = useState(user?.name);
@@ -33,7 +35,7 @@ const Profile = () => {
   const [partnerType] = useState(user?.partnerType);
 
   const [imgFile, setImgFile] = useState(user?.img);
-
+  const [specialization, setSpecialization] = useState(user?.specialization || [])
   let NIC_Text = "NIC";
   let NAME_Text = "Name";
 
@@ -48,7 +50,7 @@ const Profile = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name || !email || !lastName || !nic) {
+    if ((!name || !email || !lastName || !nic )&& type !== 'Management') {
       displayAlert();
       return;
     }
@@ -65,6 +67,7 @@ const Profile = () => {
         studentID,
         faculty,
         contactNo,
+        specialization
       });
     } else if (type === "Staff") {
       updateUser({
@@ -78,6 +81,7 @@ const Profile = () => {
         address,
         department,
         jobRole,
+        specialization
       });
     } else if (type === "Alumni") {
       updateUser({
@@ -92,28 +96,24 @@ const Profile = () => {
         company,
         jobTitle,
         graduatedYear,
+        specialization
       });
     } else if (type === "Partner") {
       updateUser({ name, email, lastName, nic, type, id, location });
+    } else if (type === "Management") {
+      updateUser({ name, email, type, id, location });
     }
   };
 
   const uploadProfileImage = async () => {
-
     await uploadProfile({
       selectedImage,
       id,
-      type
-    })
+      type,
+    });
 
     await setImgFile(null);
-    
-
-  
-
-
   };
-
   return (
     <Wrapper>
       <form className="form" onSubmit={handleSubmit}>
@@ -150,6 +150,8 @@ const Profile = () => {
             />
           )}
 
+          
+
           <FormRow
             type="text"
             labelText={NAME_Text}
@@ -165,7 +167,7 @@ const Profile = () => {
             handleChange={(e) => setEmail(e.target.value)}
           />
 
-          {user.type !== "Partner" && (
+          {!["Partner", "Management"].includes(user.type) && (
             <FormRow
               type="text"
               labelText="last name"
@@ -211,6 +213,25 @@ const Profile = () => {
             // </div>
           )}
 
+          { userTypesWithSpecialization.includes(user.type) && 
+            <div className="form-row">
+            <label htmlFor="projectRequirement" className="form-label">
+              Specialization
+            </label>
+              <Select
+                isMulti
+                name="Specialization"
+                className="basic-multi-select"
+                classNamePrefix="select"
+                options={projectRequirement}
+                value={specialization}
+                onChange={(value) => {
+                  setSpecialization(value)
+                }}
+  
+              />
+            </div>
+          }
           {user.type === "Staff" && (
             <FormRow
               type="text"
