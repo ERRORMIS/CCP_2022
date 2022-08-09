@@ -67,7 +67,7 @@ const Register = () => {
           handleChange={handleChange}
         />
         <button type='submit' className='btn btn-block' disabled={isLoading}>
-          Login
+          submit
         </button>
         <br></br>
         <Link to="/forgotpassword" className="login-screen__forgotpassword" tabIndex ={4}>

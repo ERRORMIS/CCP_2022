@@ -7,7 +7,6 @@ import StaffContainer from "../../components/StaffContainer";
 import AlumniComponent from "../../components/alumni.component";
 import PartnerComponent from "../../components/partner.component";
 import StudentComponent from "../../components/student.component";
-import { userTypesWithSpecialization } from '../../constants/constants';
 
 const initialState = {
   name: "",
@@ -21,7 +20,6 @@ const initialState = {
   partnertype: "Academic",
   isPasswordError: false,
   passwordErrMsg: "",
-  specialization: []
 };
  
 const accountTypeList = [
@@ -29,12 +27,12 @@ const accountTypeList = [
   { label: "Staff", value: "Staff" },
   { label: "Alumni", value: "Alumni" },
   { label: "Partner", value: "Partner" },
+  { label: "Incubator", value: "Incubator" },
 ];
 
 const Search = () => {
 
   const [values, setValues] = useState(initialState);
-  const [searchResults, setSearchResults] = useState([]);
 
   const {
     getStaffList,
@@ -53,91 +51,34 @@ const Search = () => {
     searchType,
     sort,
     numOfPages,
-    projectRequirement
   } = useAppContext()
-
-  useEffect(() => {
-    switch (values.type) {
-      case 'Student': {
-        const filtered = studentList.filter((student) => 
-          (!values.name || values.name === "" || student.name.toLowerCase().includes(values.name.toLowerCase()))
-          && (!values.email || values.email === "" || student.email.includes(values.email.toLowerCase()))
-          && (values.specialization.length === 0 || student.specialization.find((specialization) => values.specialization.find(({ value: val}) => val === specialization.value)))
-          )
-        setSearchResults(filtered);
-        break;
-      }
-
-      case 'Alumni': {
-        const filtered = alumniList.filter((alumni) => 
-          (!values.name || values.name === "" || alumni.name.toLowerCase().includes(values.name.toLowerCase()))
-          && (!values.email || values.email === "" || alumni.email.toLowerCase().includes(values.email.toLowerCase()))
-          && (values.specialization.length === 0 || alumni.specialization.find((specialization) => values.specialization.find(({ value: val}) => val === specialization.value)))
-          )
-        setSearchResults(filtered);
-        break;
-      }
-
-      case 'Staff': {
-        const filtered = staffList.filter((staff) => 
-          (!values.name || values.name === "" || staff.name.toLowerCase().includes(values.name.toLowerCase()))
-          && (!values.email || values.email === "" || staff.email.toLowerCase().includes(values.email.toLowerCase()))
-          && (values.specialization.length === 0 || staff.specialization.find((specialization) => values.specialization.find(({ value: val}) => val === specialization.value)))
-          )
-        setSearchResults(filtered);
-        break;
-      }
-
-      case 'Partner': {
-        const filtered = partnerList.filter((partner) => 
-          (!values.name || values.name === "" || partner.name.toLowerCase().includes(values.name.toLowerCase()))
-          && (!values.email || values.email === "" || partner.email.toLowerCase().includes(values.email.toLowerCase()))
-          )
-        setSearchResults(filtered);
-        break;
-      }
-    }
-  }, [
-    staffList,
-    alumniList,
-    partnerList,
-    studentList,
-  ]);
+  
   
   const handleSubmit = (e) => {
-    e.preventDefault();
-    switch(values.type) {
-      case 'Student': 
-        getStudentList();
-        break;
-
-      case 'Alumni': 
-        getAlumniList();
-        break;
-
-      case 'Partner':
-        getPartnerList();
-        break;
-
-      case 'Staff':
-        getStaffList();
-        break;
-
+    e.preventDefault()
+    console.log(values.type);
+    if(values.type === 'Staff'){
+      getStaffList();
     }
+    if(values.type === 'Alumni'){
+      getAlumniList();
+    }
+    if(values.type === 'Partner'){
+      getPartnerList();
+    }
+    if(values.type === 'Student'){
+      getStudentList();
+    }
+
+   
   }
 
   const handleChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  const handleOnSpecializationChange = (value) => {
-    setValues({
-      ...values,
-      specialization: value
-    })
-  }
-
   const manageUserType = (e) => {
+    console.log(e.value);
     setValues({ ...values, type: e.value });
   };
 
@@ -169,27 +110,10 @@ const Search = () => {
               value={values.name}
               handleChange={handleChange}
             />
-            { userTypesWithSpecialization.includes(values.type) &&
-              <div className="form-row">
-              <label htmlFor="projectRequirement" className="form-label">
-                Specialization
-              </label>
-                <Select
-                  isMulti
-                  name="Specialization"
-                  className="basic-multi-select"
-                  classNamePrefix="select"
-                  options={projectRequirement}
-                  value={values.specialization}
-                  onChange={handleOnSpecializationChange}
-    
-                />
-              </div>
-            }
             <FormRow
               type="text"
               name="email"
-              value={values.email}
+              value={values.name}
               handleChange={handleChange}
             />
 
@@ -205,7 +129,7 @@ const Search = () => {
       {values.type === 'Staff' &&
           <div>
             <div className="col-md-12">
-              {searchResults.map((job) => {
+              {staffList.map((job) => {
                   return <StaffContainer key={job._id} {...job} />
               })}
             </div>
@@ -215,7 +139,7 @@ const Search = () => {
       {values.type === 'Alumni' &&
           <div>
             <div className="col-md-12">
-                {searchResults.map((job) => {
+                {alumniList.map((job) => {
                  return <AlumniComponent key={job._id} {...job} />
               })}
             </div>
@@ -225,7 +149,7 @@ const Search = () => {
       {values.type === 'Partner' &&
           <div>
             <div className="col-md-12">
-            {searchResults.map((job) => {
+            {partnerList.map((job) => {
           return <PartnerComponent key={job._id} {...job} />
               })}
             </div>
@@ -235,7 +159,8 @@ const Search = () => {
       {values.type === 'Student' &&
           <div>
             <div className="col-md-12">
-            {searchResults.map((job) => {
+            {partnerList.map((job) => {
+              console.log(job);
           return <StudentComponent key={job._id} {...job} />
               })}
             </div>
