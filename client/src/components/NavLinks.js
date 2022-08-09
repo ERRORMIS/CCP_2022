@@ -5,170 +5,111 @@ import { MdQueryStats } from 'react-icons/md'
 import { FaWpforms } from 'react-icons/fa'
 import { ImProfile } from 'react-icons/im'
 import { useAppContext } from '../context/appContext'
-import { managementUsers } from '../constants/constants'
 
 const NavLinks = ({ toggleSidebar }) => {
 
    const { user } = useAppContext();
   return (
-    <div className="nav-links">
-      <NavLink
-        to="/"
-        key={1}
-        onClick={toggleSidebar}
-        className={({ isActive }) =>
-          isActive ? "nav-link active" : "nav-link"
-        }
-      >
-        <span className="icon">
-          <IoBarChartSharp />
-        </span>
-        {"stats"}
-      </NavLink>
+    <div className='nav-links'>
 
-      <NavLink
-        to="/all-jobs"
-        key={2}
-        onClick={toggleSidebar}
-        className={({ isActive }) =>
-          isActive ? "nav-link active" : "nav-link"
-        }
-      >
-        <span className="icon">
-          <MdQueryStats />
-        </span>
-        {"all projects"}
-      </NavLink>
+          <NavLink
+              to="/"
+              key={1}
+              onClick={toggleSidebar}
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+              <span className='icon'><IoBarChartSharp /></span>
+              {"stats"}
+          </NavLink>
 
-      <NavLink
-        to="/add-job"
-        key={3}
-        onClick={toggleSidebar}
-        className={({ isActive }) =>
-          isActive ? "nav-link active" : "nav-link"
-        }
-      >
-        <span className="icon">
-          <FaWpforms />
-        </span>
-        {"add project"}
-      </NavLink>
+          <NavLink
+              to="/all-jobs"
+              key={2}
+              onClick={toggleSidebar}
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+              <span className='icon'><MdQueryStats /></span>
+              {"all projects"}
+          </NavLink>
 
-      <NavLink
-        to="/profile"
-        key={4}
-        onClick={toggleSidebar}
-        className={({ isActive }) =>
-          isActive ? "nav-link active" : "nav-link"
-        }
-      >
-        <span className="icon">
-          <ImProfile />
-        </span>
-        {"profile"}
-      </NavLink>
+          <NavLink
+              to="/add-job"
+              key={3}
+              onClick={toggleSidebar}
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+              <span className='icon'><FaWpforms /></span>
+              {"add project"}
+          </NavLink>
 
-      <NavLink
-        to="/faculty"
-        key={5}
-        onClick={toggleSidebar}
-        className={({ isActive }) =>
-          isActive ? "nav-link active" : "nav-link"
-        }
-      >
-        <span className="icon">
-          <FaWpforms />
-        </span>
-        {"faculty"}
-      </NavLink>
+          <NavLink
+              to="/profile"
+              key={4}
+              onClick={toggleSidebar}
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+              <span className='icon'><ImProfile /></span>
+              {"profile"}
+          </NavLink>
 
-      <NavLink
-        to="/academic-staff"
-        key={6}
-        onClick={toggleSidebar}
-        className={({ isActive }) =>
-          isActive ? "nav-link active" : "nav-link"
-        }
-      >
-        <span className="icon">
-          <FaWpforms />
-        </span>
-        {"staff"}
-      </NavLink>
+          <NavLink
+              to="/faculty"
+              key={5}
+              onClick={toggleSidebar}
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+              <span className='icon'><FaWpforms /></span>
+              {"faculty"}
+          </NavLink>
+          
+          <NavLink
+              to="/academic-staff"
+              key={6}
+              onClick={toggleSidebar}
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+              <span className='icon'><FaWpforms /></span>
+              {"staff"}
+          </NavLink>
 
-      <NavLink
-        to="/partner-list"
-        key={7}
-        onClick={toggleSidebar}
-        className={({ isActive }) =>
-          isActive ? "nav-link active" : "nav-link"
-        }
-      >
-        <span className="icon">
-          <FaWpforms />
-        </span>
-        {"partners"}
-      </NavLink>
+          <NavLink
+              to="/partner-list"
+              key={7}
+              onClick={toggleSidebar}
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+              <span className='icon'><FaWpforms /></span>
+              {"partners"}
+          </NavLink>
 
-      <NavLink
-        to="/alumni-list"
-        key={8}
-        onClick={toggleSidebar}
-        className={({ isActive }) =>
-          isActive ? "nav-link active" : "nav-link"
-        }
-      >
-        <span className="icon">
-          <FaWpforms />
-        </span>
-        {"alumni"}
-      </NavLink>
+          <NavLink
+              to="/alumni-list"
+              key={8}
+              onClick={toggleSidebar}
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+              <span className='icon'><FaWpforms /></span>
+              {"alumni"}
+          </NavLink>
 
-      <NavLink
-        to="/search"
-        key={9}
-        onClick={toggleSidebar}
-        className={({ isActive }) =>
-          isActive ? "nav-link active" : "nav-link"
-        }
-      >
-        <span className="icon">
-          <FaWpforms />
-        </span>
-        {"Search"}
-      </NavLink>
+          <NavLink
+              to="/search"
+              key={8}
+              onClick={toggleSidebar}
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+              <span className='icon'><FaWpforms /></span>
+              {"Search"}
+          </NavLink>
 
-        { managementUsers.includes(user.type) && (
+          {user.type === 'Incubator' && (
             <NavLink
-                to="/project-logs"
-                key={10}
+                to="/academic-staff"
+                key={9}
                 onClick={toggleSidebar}
                 className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
                 <span className='icon'><FaWpforms /></span>
-                {"Project Logs"}
+                {"finance details"}
             </NavLink>
           )}
 
 
+
         {/* )
       })} */}
-      {user.type === "Incubator" && (
-        <NavLink
-          to="/financial"
-          key={10}
-          onClick={toggleSidebar}
-          className={({ isActive }) =>
-            isActive ? "nav-link active" : "nav-link"
-          }
-        >
-          <span className="icon">
-            <FaWpforms />
-          </span>
-          {"financial details"}
-        </NavLink>
-      )}
     </div>
-  );
+  )
 }
 
 export default NavLinks
