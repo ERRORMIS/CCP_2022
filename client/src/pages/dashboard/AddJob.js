@@ -12,6 +12,7 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { Col, Row } from "react-bootstrap";
 import ImportCSVModal from "../../components/ImportCSVModal";
+import MemberRecommendations from "../../components/MemberRecommendations";
 
 const AddJob = () => {
   const {
@@ -227,7 +228,7 @@ const AddJob = () => {
           </div>
         </div>
       </form>
-      {/* <MemberRecommendations /> */}
+      <MemberRecommendations />
 
       <ImportCSVModal
         show={showImportModal}
