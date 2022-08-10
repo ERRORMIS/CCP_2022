@@ -33,8 +33,6 @@ import {
   GET_PARTNER_SUCCESS,
   GET_STUDENT_BEGIN,
   GET_STUDENT_SUCCESS,
-  GET_FILTERED_USER_BASE_ON_PROJECT_REQUIREMENT,
-  STOP_LOADING,
 } from "./actions";
 
 import { initialState } from "./appContext";
@@ -141,12 +139,6 @@ const reducer = (state, action) => {
       startDate: "",
       endDate: "",
       requirement: "",
-      teamMembers: {
-        studentList: [],
-        alumniList: [],
-        staffList: [],
-      },
-      filteredUserBasedOnProjectRequirement: []
     };
 
     return {
@@ -189,8 +181,8 @@ const reducer = (state, action) => {
     };
   }
   if (action.type === SET_EDIT_JOB) {
-    const job = state.jobs.myJobs.find((job) => job._id === action.payload.id);
-    const { _id, title, owner, description, jobType, status, startDate, endDate, requirement, teamMembers } = job;
+    const job = state.jobs.find((job) => job._id === action.payload.id);
+    const { _id, title, owner, description, jobType, status, startDate, endDate, requirement } = job;
     return {
       ...state,
       isEditing: true,
@@ -202,8 +194,7 @@ const reducer = (state, action) => {
       status,
       startDate, 
       endDate, 
-      requirement,
-      teamMembers
+      requirement
     };
   }
   if (action.type === DELETE_JOB_BEGIN) {
@@ -303,22 +294,10 @@ const reducer = (state, action) => {
     return {
       ...state,
       isLoading: false,
-      studentList: action.payload.studentList,
+      partnerList: action.payload.studentList,
       totalJobs: action.payload.totalJobs,
       numOfPages: action.payload.numOfPages,
     };
-  }
-  if (action.type === GET_FILTERED_USER_BASE_ON_PROJECT_REQUIREMENT) {
-    return {
-      ...state,
-      filteredUserBasedOnProjectRequirement: action.payload,
-    };
-  }
-  if (action.type === STOP_LOADING) {
-    return {
-      ...state, 
-      isLoading: false
-    }
   }
   throw new Error(`no such action : ${action.type}`);
 };
