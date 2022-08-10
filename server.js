@@ -21,6 +21,8 @@ import connectDB from './db/connect.js'
 import authRouter from './routes/authRoutes.js'
 import jobsRouter from './routes/jobsRoutes.js'
 import studentRouter from './routes/user_routes.js'
+import logRouter from './routes/logRoutes.js';
+import reportRouter from './routes/reportRoutes.js'
 
 // middleware
 import notFoundMiddleware from './middleware/not-found.js'
@@ -45,7 +47,10 @@ app.use(mongoSanitize())
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/jobs', authenticateUser, jobsRouter)
 // app.use('/api/v1/jobs', jobsRouter)
+app.use('/api/v1/user', studentRouter);
+app.use('/api/v1/logs', logRouter);
 app.use('/api/v1/user', studentRouter)
+app.use('/api/v1/report',authenticateUser, reportRouter)
 
 // only when ready to deploy
  app.get('*', (req, res) => {

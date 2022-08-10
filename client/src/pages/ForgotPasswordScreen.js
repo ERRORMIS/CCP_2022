@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-import "./ForgotPasswordScreen.css";
+import Wrapper from "../assets/wrappers/ForgotPassword";
+import { Row, Col } from "react-bootstrap";
 
 const ForgotPasswordScreen = () => {
   const [email, setEmail] = useState("");
@@ -9,6 +10,10 @@ const ForgotPasswordScreen = () => {
 
   const forgotPasswordHandler = async (e) => {
     e.preventDefault();
+    if (!email) {
+      setError("Please enter your email");
+      return;
+    }
 
     const config = {
       headers: {
@@ -16,53 +21,77 @@ const ForgotPasswordScreen = () => {
       },
     };
 
-    try {
-      const { data } = await axios.post(
-        "/api/v1/auth/forgotpassword",
-        { email },
-        config
-      );
+    await axios.post(
+      "/api/v1/auth/reset-password",
+      { email },
+      config
+    ).then(({data}) => {
+      if (data.success) {
+        setSuccess(data.msg);
+      } else {
+        setError(data.msg);
+      }
 
-      setSuccess(data.data);
-    } catch (error) {
-      setError(error.response.data.error);
+    }).catch((err) => {
+      console.log(err);
+    })
+
+    setTimeout(() => {
+      setError("");
+      setSuccess("");
       setEmail("");
-      setTimeout(() => {
-        setError("");
-      }, 5000);
-    }
+    }, 5000);
+  };
+
+  const handleOnBack = () => {
+    window.history.back();
   };
 
   return (
-    <div className="forgotpassword-screen">
-      <form
-        onSubmit={forgotPasswordHandler}
-        className="forgotpassword-screen__form"
-      >
-        <header></header>
-        <h3 className="forgotpassword-screen__title">Forgot Password</h3>
-        {error && <span className="error-message">{error}</span>}
-        {success && <span className="success-message">{success}</span>}
-        <div className="form-group">
-          <p className="forgotpassword-screen__subtext">
-            Please enter the email address you register your account with. We
-            will send you reset password confirmation to this email
-          </p>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            required
-            id="email"
-            placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <button type="submit" className="btn btn-primary">
-          Send Email
-        </button>
-      </form>
-    </div>
+    <Wrapper>
+      <div className="forgot-password-screen">
+        <form
+          onSubmit={forgotPasswordHandler}
+          className="forgotpassword-screen__form"
+        >
+          <header></header>
+          <h3 className="forgotpassword-screen__title">Forgot Password</h3>
+          {error && <Row className="error-message">{error}</Row>}
+          {success && <Row className="success-message">{success}</Row>}
+
+          <div className="form-group">
+            <p className="forgotpassword-screen__subtext">
+              Please enter the email address you register your account with. We
+              will send you reset password to this email.
+            </p>
+            <Row className="my-3 justify-content-center">
+              <Col xs={2}>
+                <label htmlFor="email">Email:</label>
+              </Col>
+              <Col xs={10}>
+                <input
+                  type="email"
+                  required
+                  id="email"
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="form-control"
+                />
+              </Col>
+            </Row>
+          </div>
+          <Row>
+            <button type="submit" className="btn btn-primary">
+              Send Email
+            </button>
+            <button className="btn back-btn mt-3" onClick={handleOnBack}>
+              back
+            </button>
+          </Row>
+        </form>
+      </div>
+    </Wrapper>
   );
 };
 

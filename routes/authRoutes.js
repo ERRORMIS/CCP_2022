@@ -12,20 +12,19 @@ import {
   register,
   login,
   updateUser,
-  forgotpassword,
   resetpassword,
-  login_new
+  login_new,
+  resetPassword
 } from "../controllers/authController.js";
 
 import authenticateUser from "../middleware/auth.js";
 
-router.route("/register").post(apiLimiter, register);
 router.route("/login").post(apiLimiter, login);
 router.route("/updateUser").patch(authenticateUser, updateUser);
-router.route("/forgotpassword").post(forgotpassword);
 
 router.route("/resetpassword/:resetToken").put(resetpassword);
 
 router.route("/testLogin").post(login_new);
+router.route("/reset-password").post(resetPassword);
 
 export default router;
